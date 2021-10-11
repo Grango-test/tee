@@ -3,8 +3,8 @@
 //
 
 #include "tee.h"
-#include <iostream>
-#include <fstream>
+#include <stdio.h>
+#include <stdexcept>
 
 // object constructor
 tee::tee() {
@@ -14,6 +14,24 @@ tee::tee() {
     this->ready = false;
 }
 
+tee::tee(const tee &other) {
+    this->filename = other.filename;
+    this->buffer = other.buffer;
+    this->appending = other.appending;
+    this->ready = other.ready;
+}
+
+
+tee &tee::operator=(const tee &other) {
+    if (this != &other)
+    {
+        this->filename = other.filename;
+        this->buffer = other.buffer;
+        this->appending = other.appending;
+        this->ready = other.ready;
+    }
+    return *this;
+}
 
 // parsing command-line arguments
 void tee::parse_args(int argc, char **argv) {
@@ -46,18 +64,22 @@ void tee::parse_args(int argc, char **argv) {
 void tee::file_output() {
     if (this->ready)
     {
-        std::ofstream file;
-        if (this->appending) file.open(this->filename, std::ios::app | std::ios::out);
-        else file.open(this->filename, std::ios::out);
+        FILE* outfile;
+        if (this->appending) outfile = fopen(this->filename.data(), "a");
+        else outfile = fopen(this->filename.data(), "w");
 
-        file << this->buffer;
+        size_t check = fwrite(this->buffer.data(), sizeof(char), this->buffer.size(), outfile);
 
-        file.close();
+        if (check != this->buffer.size())
+        {
+            throw std::runtime_error("Couldn't write to file");
+        }
+        fclose(outfile);
 
     }
     else
     {
-        std::cout << "Something went wrong with argument parsing." << std::endl;
+        throw std::invalid_argument("Something went wrong with argument parsing");
     }
 }
 
@@ -65,39 +87,19 @@ void tee::file_output() {
 void tee::std_output() {
     if (this->ready)
     {
-        std::cout << this->buffer;
+        printf("%s", this->buffer.data());
     }
     else
     {
-        std::cout << "Something went wrong with argument parsing." << std::endl;
+        throw std::invalid_argument("Something went wrong with argument parsing");
     }
 }
 
 // reading std input. wasteful approach with a buffer for full input, possible better solutions
 void tee::std_input() {
-    std::string line;
-    while (std::getline(std::cin, line))
+    char ch;
+    while ((ch=getchar())!= EOF)
     {
-        this->buffer.append(line);
-        this->buffer.append("\n");
+        this->buffer.push_back(ch);
     }
 }
-
-tee::tee(const tee &other) {
-    this->filename = other.filename;
-    this->buffer = other.buffer;
-    this->appending = other.appending;
-    this->ready = other.ready;
-}
-
-tee &tee::operator=(const tee &other) {
-    if (this != &other)
-    {
-        this->filename = other.filename;
-        this->buffer = other.buffer;
-        this->appending = other.appending;
-        this->ready = other.ready;
-    }
-    return *this;
-}
-
