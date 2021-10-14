@@ -1,8 +1,8 @@
-#include "tee.h"
+#include "mytee.h"
 
 int main(int argc, char** argv)
 {
-    tee teeObject;
+    mytee teeObject;
     teeObject.parse_args(argc, argv);
     teeObject.std_input();
     teeObject.file_output();

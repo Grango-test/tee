@@ -2,23 +2,23 @@
 // Created by vladislav on 11.10.2021.
 //
 
-#ifndef TEE_TEE_H
-#define TEE_TEE_H
+#ifndef TEE_MYTEE_H
+#define TEE_MYTEE_H
 
 #include <string>
 
-class tee {
+class mytee {
 private:
     bool appending;
     bool ready;
     std::string filename, buffer;
 public:
-    tee();
-    tee(const tee& other);
+    mytee();
+    mytee(const mytee& other);
 
-    ~tee() = default;
+    ~mytee() = default;
 
-    tee& operator=(const tee& other);
+    mytee& operator=(const mytee& other);
 
     void parse_args(int argc, char** argv);
 
@@ -29,4 +29,4 @@ public:
 };
 
 
-#endif //TEE_TEE_H
+#endif //TEE_MYTEE_H

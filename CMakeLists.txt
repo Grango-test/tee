@@ -3,4 +3,4 @@ project(tee)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(tee main.cpp tee.cpp tee.h)
+add_executable(tee main.cpp mytee.cpp mytee.h)
